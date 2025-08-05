@@ -1,0 +1,38 @@
+[
+  {
+    "id": "e2488013-f8ff-4bbc-87fc-17ca737f69f9",
+    "name": "",
+    "email": "georgebassey1602@gmail.com",
+    "password": "$2b$10$IK7aVCAeQuxkh4mWmppTcuNoOQKdzdXXe7HMHmMiGz6Vwe22TTkyy"
+  },
+  {
+    "id": "e2b20678-f3cd-4e4a-8ef6-24a579ffebea",
+    "name": "Test",
+    "email": "test@email.com",
+    "password": "$2b$10$5pgoqNIED9NSCvwBZpanrurnfA5SdJVENEO5lofRKb5fQ8XVvqe5q"
+  },
+  {
+    "id": "ab237071-572c-47ab-9b70-76895ee2d093",
+    "name": "",
+    "email": "example@gmail.com",
+    "password": "$2b$10$OZgEPTXmEwN84Ulif5lX7umgtv/XqBo3ycpUducfGhDjQJYqBAsYG"
+  },
+  {
+    "id": "c10f8ac6-1ad5-4c86-9ec1-ca9d1b36e086",
+    "name": "Test",
+    "email": "test@email.com",
+    "password": "$2b$10$wM6Qtqd3UCfn.0nWrfYO1Oih2bMr8g20Q.w/OmeIhOzXvg9KctHFu"
+  },
+  {
+    "id": "a70c1c4f-0fd9-45fe-8469-61bae2e1d97a",
+    "name": "",
+    "email": "wuga@gmail.com",
+    "password": "$2b$10$zlPmuuzNkbS2M81zJdEbbOBhTUIlct4IGz.jBQQDmcUHTPqw1sA2i"
+  },
+  {
+    "id": "c6307515-8f6e-4a74-a1c9-98e7c4f29942",
+    "name": "Test",
+    "email": "test@email.com",
+    "password": "$2b$10$UpODah6ZMrdXdLAsRXVjHOZ0uR2O5rg1uvbfPNqHsdU7bZYUdzxdK"
+  }
+]
