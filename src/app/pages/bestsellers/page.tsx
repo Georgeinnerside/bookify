@@ -95,7 +95,7 @@ export default function BestsellersPage() {
     };
 
     fetchBooks();
-  }, []);
+  }, [URL, query]);
 
   const handleFilteredChange = (filters: {
     priceRange: [number, number];

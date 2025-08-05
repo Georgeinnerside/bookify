@@ -46,7 +46,7 @@ export default function PopularBooks() {
     };
 
     fetchBooks();
-  }, []);
+  }, [URL, query]);
 
   return (
     <section className="py-10 max-w-6xl mx-auto">

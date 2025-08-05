@@ -1,112 +1,189 @@
 import Image from "next/image";
 import { Metadata } from "next";
-import {
-  truncDescription,
-  upperCaseAtuhor,
-  removeHTML,
-} from "../../utils/helpers";
 
-import getHighResImage from "../../utils/helpers";
-import { cache } from "react";
-
-function highResImage(volumeInfo: any) {
-  if (volumeInfo.imageLinks?.thumbnail) {
-    return volumeInfo.imageLinks.thumbnail.replace("zoom=1", "zoom=3");
-  }
-
-  const isbn = volumeInfo.industryIdentifiers?.find(
-    (id: any) => id.type === "ISBN_10"
-  ).identifier;
-
-  if (isbn) {
-    return `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
-  }
-
-  return "https://via.placeholder.com/150x220?text=No+Image";
+interface Book {
+  id: string;
+  volumeInfo: {
+    title: string;
+    authors?: string[];
+    publisher?: string;
+    description?: string;
+    imageLinks?: {
+      thumbnail?: string;
+    };
+  };
 }
 
 export async function generateMetadata({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }): Promise<Metadata> {
-  const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_BOOK_API_KEY;
-  const res = await fetch(
-    `https://www.googleapis.com/books/v1/volumes/${params.id}?key=${API_KEY}`,
-    { cache: "no-store" }
-  );
+  const { id } = await params;
+  const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_BOOKS_API_KEY;
+  const URL = `https://www.googleapis.com/books/v1/volumes/${id}?key=${API_KEY}`;
 
-  const book = await res.json();
+  try {
+    const res = await fetch(URL, {
+      next: { revalidate: 86400, tags: [`book:${id}`] },
+    });
 
-  const title = book.volumeInfo.title || "Book Details";
-  const description =
-    book.volumeInfo?.description?.slice(0, 150) || "Read this book on Bookify";
-  const image = highResImage(book.volumeInfo);
+    if (!res.ok) {
+      throw new Error(`Failed to fetch metadata: ${res.statusText}`);
+    }
 
-  return {
-    title: `${title} | Bookify`,
-    description,
-    openGraph: {
-      title,
+    const book: Book = await res.json();
+
+    const title = book.volumeInfo?.title || "Book Not Found";
+    const description =
+      book.volumeInfo?.description?.slice(0, 160) || "Book details page";
+    const image =
+      book.volumeInfo?.imageLinks?.thumbnail
+        ?.replace("http://", "https://")
+        ?.replace("zoom=1", "zoom=2") || "/default-book.jpg";
+
+    return {
+      title: `${title} | Bookify`,
       description,
-      url: `https://yourdomain.com/books/${params.id}`,
-      images: [{ url: image, width: 1200, height: 630, alt: title }],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: [image],
-    },
-  };
+      openGraph: {
+        title,
+        description,
+        images: [
+          {
+            url: image,
+            width: 200,
+            height: 300,
+            alt: title,
+          },
+        ],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+        images: [image],
+      },
+    };
+  } catch (error) {
+    console.error("Error generating metadata:", error);
+
+    return {
+      title: "Book Details | Bookify",
+      description: "Explore amazing books on Bookify",
+      openGraph: {
+        title: "Book Details | Bookify",
+        description: "Explore amazing books on Bookify",
+        images: [
+          {
+            url: "/default-book.jpg",
+            width: 200,
+            height: 300,
+            alt: "Book cover placeholder",
+          },
+        ],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: "Book Details | Bookify",
+        description: "Explore amazing books on Bookify",
+        images: ["/default-book.jpg"],
+      },
+    };
+  }
 }
-
 export default async function BookDetails({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_BOOK_API_KEY;
-  const URL = `https://www.googleapis.com/books/v1/volumes/${params.id}?key=${API_KEY}`;
+  const { id } = await params;
+  const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_BOOKS_API_KEY;
+  const URL = `https://www.googleapis.com/books/v1/volumes/${id}?key=${API_KEY}`;
 
-  const res = await fetch(URL);
-  const book = await res.json();
-  const volume = book.volumeInfo;
+  try {
+    const res = await fetch(URL, {
+      next: { revalidate: 86400, tags: [`book:${id}`] },
+    });
 
-  if (!book) return <p>No Book found...</p>;
+    if (!res.ok) {
+      throw new Error(`Failed to fetch book details: ${res.statusText}`);
+    }
 
-  return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <div className="flex flex-col md:flex-row gap-6 pb-20 scroll-smooth">
-        <div className="w-full md:w-1/2 relative aspect-[2/3]">
-          <Image
-            src={
-              highResImage(volume) ||
-              "https://via.placeholder.com/150x220?text=No+Image"
-            }
-            alt={book?.title || "Book Cover"}
-            fill
-            className="rounded-lg object-cover"
-          />
+    const book: Book = await res.json();
+
+    if (!book || !book.volumeInfo) {
+      return (
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          <p className="text-gray-600 text-lg">No book details found.</p>
         </div>
+      );
+    }
 
-        <div className="w-full md:w-1/2">
-          <h1 className="text-3xl font-bold text-emerald-800 mb-2">
-            {book.volumeInfo.title}
-          </h1>
-          <p className="text-lg font-medium text-gray-700 mb-1">
-            Title: {upperCaseAtuhor(book.volumeInfo.author)}
-          </p>
-          <p className="text-xl text-gray-500 mb-4">
-            Publisher: {book.volumeInfo.publisher}
-          </p>
-          <p className="text-sm text-gray-700 mb-4">
-            Description:{" "}
-            {truncDescription(removeHTML(book.volumeInfo.description), 200) ||
-              "No description available"}
-          </p>
+    const {
+      title = "Unknown Title",
+      authors,
+      publisher,
+      description,
+      imageLinks,
+    } = book.volumeInfo;
+
+    const imageUrl =
+      imageLinks?.thumbnail
+        ?.replace("http://", "https://")
+        ?.replace("zoom=1", "zoom=2") ||
+      "https://via.placeholder.com/150x220?text=No+Image";
+
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="flex flex-col md:flex-row gap-6 pb-20">
+          {/* Book Image */}
+          <div className="w-full md:w-1/2 relative aspect-[2/3]">
+            <Image
+              src={imageUrl}
+              alt={title}
+              fill
+              className="rounded-lg object-cover"
+              priority
+            />
+          </div>
+
+          {/* Book Details */}
+          <div className="w-full md:w-1/2">
+            <h1 className="text-3xl font-bold text-emerald-800 mb-2">
+              {title}
+            </h1>
+
+            {authors && (
+              <p className="text-lg font-medium text-gray-700 mb-1">
+                Author: {authors.join(", ")}
+              </p>
+            )}
+
+            {publisher && (
+              <p className="text-xl text-gray-500 mb-4">
+                Publisher: {publisher}
+              </p>
+            )}
+
+            {description && (
+              <p className="text-sm text-gray-700 mb-4">
+                Description:{" "}
+                {description.slice(0, 200) +
+                  (description.length > 200 ? "..." : "")}
+              </p>
+            )}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  } catch (error) {
+    console.error("Error fetching book details:", error);
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <p className="text-red-500 font-semibold text-lg">
+          Something went wrong. Please try again later.
+        </p>
+      </div>
+    );
+  }
 }

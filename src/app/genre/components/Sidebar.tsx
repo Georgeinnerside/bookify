@@ -11,13 +11,9 @@ interface FilteredSidebarProps {
   }) => void;
 }
 
-
-
 const ratings = [5, 4, 3, 2, 1];
 
-export default function Sidebar({
-  onFilteredChange,
-}: FilteredSidebarProps) {
+export default function Sidebar({ onFilteredChange }: FilteredSidebarProps) {
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 200]);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
@@ -28,8 +24,7 @@ export default function Sidebar({
       selectedGenres,
       selectedRating,
     });
-  }, [priceRange, selectedGenres, selectedRating]);
-
+  }, [onFilteredChange, priceRange, selectedGenres, selectedRating]);
 
   return (
     <aside className="w-full md:w-1/6 bg-white p-4 rounded-lg shadow-sm border h-fit sm:w-fit">

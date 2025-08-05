@@ -11,7 +11,6 @@ interface FilteredSidebarProps {
   }) => void;
 }
 
-
 const ratings = [5, 4, 3, 2, 1];
 
 export default function NewReleaseSidebar({
@@ -28,7 +27,7 @@ export default function NewReleaseSidebar({
       selectedGenres,
       selectedRating,
     });
-  }, [priceRange, selectedGenres, selectedRating]);
+  }, [onFilteredChange, priceRange, selectedGenres, selectedRating]);
 
   const toggleGenre = (genre: string) => {
     setSelectedGenres((prev) =>

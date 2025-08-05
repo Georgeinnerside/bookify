@@ -1,12 +1,21 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import { useSearchBooks } from "@/hooks/useSearchBooks";
 import { SearchCard } from "@/components/cards/SearchCard";
 import { SearchCardSkeleton } from "@/components/loading/SearchCardSkeleton";
 import Footer from "@/components/Footer";
 
-export default function SearchClient() {
+export default function SearchPageWrapper() {
+  return (
+    <Suspense fallback={<p>Loading search...</p>}>
+      <SearchClient />
+    </Suspense>
+  );
+}
+
+function SearchClient() {
   const searchParams = useSearchParams();
   const query = searchParams.get("q") || "";
 

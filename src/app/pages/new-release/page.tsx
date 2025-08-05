@@ -81,7 +81,7 @@ export default function NewReleasePage() {
     };
 
     fetchBooks();
-  }, []);
+  }, [URL, query]);
 
   const handleFilteredChange = (filters: {
     priceRange: [number, number];

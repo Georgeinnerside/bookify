@@ -68,7 +68,7 @@ export default function GenrePage({
     };
 
     fetchBooks();
-  }, [genre]);
+  }, [URL,genre]);
 
   const handleFilteredChange = (filters: {
     priceRange: [number, number];

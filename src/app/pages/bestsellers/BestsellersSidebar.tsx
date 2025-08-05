@@ -27,7 +27,7 @@ export default function BestsellersSidebar({
       selectedGenres,
       selectedRating,
     });
-  }, [priceRange, selectedGenres, selectedRating]);
+  }, [onFilteredChange, priceRange, selectedGenres, selectedRating]);
 
   const toggleGenre = (genre: string) => {
     setSelectedGenres((prev) =>
