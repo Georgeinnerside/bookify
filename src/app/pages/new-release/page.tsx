@@ -49,7 +49,6 @@ export default function NewReleasePage() {
   const [books, setBooks] = useState<Book[]>([]);
   const [filteredBooks, setFilteredBooks] = useState<Book[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [page, setPage] = useState(20);
 
   const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_BOOK_API_KEY;
   const query = "lastest";
@@ -82,7 +81,7 @@ export default function NewReleasePage() {
     };
 
     fetchBooks();
-  }, [page]);
+  }, []);
 
   const handleFilteredChange = (filters: {
     priceRange: [number, number];

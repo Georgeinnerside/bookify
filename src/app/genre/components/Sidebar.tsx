@@ -16,7 +16,6 @@ interface FilteredSidebarProps {
 const ratings = [5, 4, 3, 2, 1];
 
 export default function Sidebar({
-  genres,
   onFilteredChange,
 }: FilteredSidebarProps) {
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 200]);
@@ -31,11 +30,6 @@ export default function Sidebar({
     });
   }, [priceRange, selectedGenres, selectedRating]);
 
-  // const toggleGenre = (genre: string) => {
-  //   setSelectedGenres((prev) =>
-  //     prev.includes(genre) ? prev.filter((g) => g !== genre) : [...prev, genre]
-  //   );
-  // };
 
   return (
     <aside className="w-full md:w-1/6 bg-white p-4 rounded-lg shadow-sm border h-fit sm:w-fit">

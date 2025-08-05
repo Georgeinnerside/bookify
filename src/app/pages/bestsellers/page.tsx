@@ -33,7 +33,6 @@ function highResImage(volumeInfo: any) {
   return "https://via.placeholder.com/150x220?text=No+Image";
 }
 
-// const books = [
 //   {
 //     id: "1",
 //     image: "/books/hugo.jpg",
@@ -64,13 +63,10 @@ export default function BestsellersPage() {
   const [books, setBooks] = useState<Book[]>([]);
   const [filteredBooks, setFilteredBooks] = useState<Book[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [page, setPage] = useState(1);
 
   const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_BOOK_API_KEY;
   const query = "bestsellers";
-  const URL = `https://www.googleapis.com/books/v1/volumes?q=${query}&startIndex=${
-    (page - 1) * 12
-  }&maxResults=12&key=${API_KEY}`;
+  const URL = `https://www.googleapis.com/books/v1/volumes?q=${query}&maxResults=12&key=${API_KEY}`;
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -99,7 +95,7 @@ export default function BestsellersPage() {
     };
 
     fetchBooks();
-  }, [page]);
+  }, []);
 
   const handleFilteredChange = (filters: {
     priceRange: [number, number];

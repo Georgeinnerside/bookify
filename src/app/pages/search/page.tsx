@@ -16,7 +16,7 @@ export default function SearchClient() {
     <>
       <div className="p-4">
         <h1 className="text-xl text-gray-700 font-bold mb-4">
-          Search results for: "{query}"
+          Search results for: {query}
         </h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {isLoading ? (
