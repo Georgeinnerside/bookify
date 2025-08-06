@@ -38,7 +38,7 @@ export default function CartClient() {
         <h2 className="text-gray-700 text-lg font-semibold">My Cart</h2>
         <button
           onClick={clearCart}
-          className="text-red-500 hover:text-red-600 text-sm font-semibold"
+          className="text-red-500 hover:text-red-600 text-sm font-semibold cursor-pointer"
         >
           clear
         </button>

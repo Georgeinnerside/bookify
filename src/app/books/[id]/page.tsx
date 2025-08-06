@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Metadata } from "next";
+import { removeHTML } from "@/app/utils/helpers";
 
 interface Book {
   id: string;
@@ -20,7 +21,8 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_BOOKS_API_KEY;
+  const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_BOOK_API_KEY;
+  console.log("Api key", API_KEY);
   const URL = `https://www.googleapis.com/books/v1/volumes/${id}?key=${API_KEY}`;
 
   try {
@@ -97,9 +99,10 @@ export default async function BookDetails({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_BOOKS_API_KEY;
+  console.log("Bookd ID", id);
+  const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_BOOK_API_KEY;
   const URL = `https://www.googleapis.com/books/v1/volumes/${id}?key=${API_KEY}`;
-
+  console.log("My API key", API_KEY);
   try {
     const res = await fetch(URL, {
       next: { revalidate: 86400, tags: [`book:${id}`] },
@@ -130,7 +133,7 @@ export default async function BookDetails({
     const imageUrl =
       imageLinks?.thumbnail
         ?.replace("http://", "https://")
-        ?.replace("zoom=1", "zoom=2") ||
+        ?.replace("zoom=1", "zoom=3") ||
       "https://via.placeholder.com/150x220?text=No+Image";
 
     return (
@@ -168,8 +171,8 @@ export default async function BookDetails({
             {description && (
               <p className="text-sm text-gray-700 mb-4">
                 Description:{" "}
-                {description.slice(0, 200) +
-                  (description.length > 200 ? "..." : "")}
+                {removeHTML(description.slice(0, 1000)) +
+                  (description.length > 1000 ? "..." : "")}
               </p>
             )}
           </div>

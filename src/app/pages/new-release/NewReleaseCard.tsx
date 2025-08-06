@@ -23,7 +23,7 @@ export default function NewReleaseCard({ book }: NewReleaseBookProps) {
     <motion.div
       whileHover={{ scale: 1.02 }}
       transition={{ duration: 0.3 }}
-      className="flex bg-white rounded-lg shadow hover:shadow-lg transition-all duration-300 overflow-hidden border p-4 gap-4 items-start w-full h-[230px]"
+      className="flex bg-white rounded-lg shadow hover:shadow-lg transition-all duration-300 overflow-hidden border p-4 mb-6 gap-4 items-start w-full h-[230px]"
     >
       <div className="relative w-[130px] h-[190px] flex-shrink-0 shadow-lg">
         <Image

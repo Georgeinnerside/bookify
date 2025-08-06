@@ -1,40 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import NewReleaseCard from "@/app/pages/new-release/NewReleaseCard";
 import NewReleaseSidebar from "@/app/pages/new-release/NewReleaseSidebar";
 import SkeletonCard from "@/components/loading/skeletonLoader";
 import LandingSection from "@/service/LandingSection";
-
 import Book from "@/book";
 import axios from "axios";
 
-// const books = [
-//   {
-//     id: "1",
-//     image: "/books/zen.jpg",
-//     title: "Zen",
-//     author: "Taylor Rawlings",
-//     rating: 4.8,
-//     reviews: 12487,
-//     price: 21.99,
-//     oldPrice: 25.99,
-//     discount: "Save $4.00",
-//     publishDate: "03-07-2025",
-//   },
-//   {
-//     id: "2",
-//     image: "/books/brethren.jpg",
-//     title: "The Brethren",
-//     author: "Roman Weidenfeller",
-//     rating: 4.9,
-//     reviews: 15621,
-//     price: 19.99,
-//     oldPrice: 24.99,
-//     discount: "Save $5.00",
-//     publishDate: "06-12-2024",
-//   },
-// ];
+type Filters = {
+  priceRange: [number, number];
+  selectedGenres: string[];
+  selectedRating: number | null;
+};
 
 const genreList = [
   "Fiction",
@@ -81,13 +59,9 @@ export default function NewReleasePage() {
     };
 
     fetchBooks();
-  }, [URL, query]);
+  }, [URL]);
 
-  const handleFilteredChange = (filters: {
-    priceRange: [number, number];
-    selectedGenres: string[];
-    selectedRating: number | null;
-  }) => {
+  const handleFilteredChange = useCallback((filters: Filters) => {
     const { priceRange, selectedGenres, selectedRating } = filters;
     let result = books;
 
@@ -107,7 +81,33 @@ export default function NewReleasePage() {
     }
 
     setFilteredBooks(result);
-  };
+  }, []);
+
+  // const handleFilteredChange =  (filters: {
+  //   priceRange: [number, number];
+  //   selectedGenres: string[];
+  //   selectedRating: number | null;
+  // }) => {
+  //   const { priceRange, selectedGenres, selectedRating } = filters;
+  //   let result = books;
+
+  //   // apply price filter
+  //   result = result.filter(
+  //     (b) => b.price >= priceRange[0] && b.price <= priceRange[1]
+  //   );
+
+  //   // apply genre filter
+  //   if (selectedGenres.length > 0) {
+  //     result = result.filter((b) => selectedGenres.includes(b.genre));
+  //   }
+
+  //   // apply rating
+  //   if (selectedRating) {
+  //     result = result.filter((b) => b.rating === selectedRating);
+  //   }
+
+  //   setFilteredBooks(result);
+  // };
 
   return (
     <main className="min-h-screen p-4 bg-gray-50">
@@ -128,7 +128,7 @@ export default function NewReleasePage() {
           />
 
           <section className="flex-1">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4 items-stretch">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4 mb-6 items-stretch">
               {isLoading
                 ? Array.from({ length: 12 }).map((_, index) => (
                     <SkeletonCard key={index} />

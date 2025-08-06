@@ -21,7 +21,6 @@ export default function PopularBooks() {
       setIsLoading(true);
       try {
         const res = (await axios.get(URL)) || [];
-        console.log(res.data.items);
         const fetchedBooks: Book[] = res.data.items.map((item: any) => ({
           id: item.id,
           title: item.volumeInfo.title || "Unkown Title",
@@ -46,7 +45,7 @@ export default function PopularBooks() {
     };
 
     fetchBooks();
-  }, [URL, query]);
+  }, [URL]);
 
   return (
     <section className="py-10 max-w-6xl mx-auto">

@@ -1,12 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import BestsellersCard from "@/app/pages/bestsellers/BestsellersCard";
 import BestsellersSidebar from "./BestsellersSidebar";
 import SkeletonCard from "@/components/loading/skeletonLoader";
 import LandingSection from "@/service/LandingSection";
 import Book from "@/book";
 import axios from "axios";
+
+type Filters = {
+  priceRange: [number, number];
+  selectedGenres: string[];
+  selectedRating: number | null;
+};
 
 const genreList = [
   "Fiction",
@@ -95,33 +101,32 @@ export default function BestsellersPage() {
     };
 
     fetchBooks();
-  }, [URL, query]);
+  }, [URL]);
 
-  const handleFilteredChange = (filters: {
-    priceRange: [number, number];
-    selectedGenres: string[];
-    selectedRating: number | null;
-  }) => {
-    const { priceRange, selectedGenres, selectedRating } = filters;
-    let result = books;
+  const handleFilteredChange = useCallback(
+    (filters: Filters) => {
+      const { priceRange, selectedGenres, selectedRating } = filters;
+      let result = books;
 
-    // apply price filter
-    result = result.filter(
-      (b) => b.price >= priceRange[0] && b.price <= priceRange[1]
-    );
+      // apply price filter
+      result = result.filter(
+        (b) => b.price >= priceRange[0] && b.price <= priceRange[1]
+      );
 
-    // Applt genre filter
-    if (selectedGenres.length > 0) {
-      result = result.filter((b) => selectedGenres.includes(b.genre));
-    }
+      // Applt genre filter
+      if (selectedGenres.length > 0) {
+        result = result.filter((b) => selectedGenres.includes(b.genre));
+      }
 
-    // apply rating
-    if (selectedRating) {
-      result = result.filter((b) => b.rating >= selectedRating);
-    }
+      // apply rating
+      if (selectedRating) {
+        result = result.filter((b) => b.rating >= selectedRating);
+      }
 
-    setFilteredBooks(result);
-  };
+      setFilteredBooks(result);
+    },
+    [books]
+  );
 
   return (
     <main className="min-h-screen p-4 bg-gray-50">

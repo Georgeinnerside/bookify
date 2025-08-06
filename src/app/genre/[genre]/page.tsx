@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
+import { useEffect, useState, use, useCallback } from "react";
 import GenreHeader from "../components/GenreHeader";
 import GenreGrid from "../components/GenreGrid";
 import Sidebar from "../components/Sidebar";
@@ -18,6 +18,12 @@ interface Book {
   reviews: number;
   genre: string;
 }
+
+type Filters = {
+  priceRange: [number, number];
+  selectedGenres: string[];
+  selectedRating: number | null;
+};
 
 const genreList = [
   "Fiction",
@@ -41,70 +47,74 @@ export default function GenrePage({
   const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_BOOK_API_KEY;
   const URL = `https://www.googleapis.com/books/v1/volumes?q=subject:${genre}&maxResults=12&key=${API_KEY}`;
 
-  useEffect(() => {
-    const fetchBooks = async () => {
-      setLoading(true);
-      try {
-        const res = await axios.get(URL);
-        const fetchedBooks = res.data.items.map((item: any) => ({
-          id: item.id,
-          title: item.volumeInfo.title,
-          authors: item.volumeInfo.authors || ["Unkown Author"],
-          image: item.volumeInfo.imageLinks?.thumbnail,
-          price: Math.random() * (30 - 10) * 10,
-          oldPrice: Math.random() * (40 - 31) * 10,
-          rating: Math.floor(Math.random() * 5) + 1,
-          reviews: Math.floor(Math.random() * 1000),
-          genre,
-        }));
-        setBooks(fetchedBooks);
-        setFilteredBooks(fetchedBooks);
-        setLoading(false);
-      } catch (error) {
-        console.error("couldn't fetch book", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBooks();
-  }, [URL,genre]);
-
-  const handleFilteredChange = (filters: {
-    priceRange: [number, number];
-    selectedGenres: string[];
-    selectedRating: number | null;
-  }) => {
-    const { priceRange, selectedGenres, selectedRating } = filters;
-    let result = books;
-
-    // apply price filter
-    result = result.filter(
-      (b) => b.price >= priceRange[0] && b.price <= priceRange[1]
-    );
-
-    // Applt genre filter
-    if (selectedGenres.length > 0) {
-      result = result.filter((b) => selectedGenres.includes(b.genre));
+  const fetchBooks = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get(URL);
+      const fetchedBooks = res.data.items.map((item: any) => ({
+        id: item.id,
+        title: item.volumeInfo.title,
+        authors: item.volumeInfo.authors || ["Unkown Author"],
+        image: item.volumeInfo.imageLinks?.thumbnail,
+        price: Math.random() * (30 - 10) * 10,
+        oldPrice: Math.random() * (40 - 31) * 10,
+        rating: Math.floor(Math.random() * 5) + 1,
+        reviews: Math.floor(Math.random() * 1000),
+        genre,
+      }));
+      setBooks(fetchedBooks);
+      setFilteredBooks(fetchedBooks);
+      setLoading(false);
+    } catch (error) {
+      console.error("couldn't fetch book", error);
+    } finally {
+      setLoading(false);
     }
-
-    // apply rating
-    if (selectedRating) {
-      result = result.filter((b) => b.rating === selectedRating);
-    }
-
-    setFilteredBooks(result);
   };
+
+  useEffect(() => {
+    fetchBooks();
+  }, []);
+
+  const handleFilteredChange = useCallback(
+    (filters: Filters) => {
+      const { priceRange, selectedGenres, selectedRating } = filters;
+      let result = books;
+
+      // apply price filter
+      result = result.filter(
+        (b) => b.price >= priceRange[0] && b.price <= priceRange[1]
+      );
+
+      // Applt genre filter
+      if (selectedGenres.length > 0) {
+        result = result.filter((b) => selectedGenres.includes(b.genre));
+      }
+
+      // apply rating
+      if (selectedRating) {
+        result = result.filter((b) => b.rating === selectedRating);
+      }
+
+      setFilteredBooks(result);
+    },
+    [books]
+  );
 
   return (
     <LandingSection>
       <div className="min-h-screen bg-gray-50">
         <GenreHeader genre={genre} total={books.length} />
 
-        <div className="flex flex-col md:flex-row gap-6">
-          <Sidebar genres={genreList} onFilteredChange={handleFilteredChange} />
+        <div className="flex flex-col min-h-screen pb-10">
+          <div className="flex flex-col md:flex-row px-6 gap-6">
+            <Sidebar
+              genres={genreList}
+              onFilteredChange={handleFilteredChange}
+            />
 
-          <GenreGrid books={filteredBooks} loading={loading} />
+            <GenreGrid books={filteredBooks} loading={loading} />
+          </div>
         </div>
       </div>
     </LandingSection>

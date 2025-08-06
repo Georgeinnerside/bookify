@@ -209,13 +209,13 @@ export const Navbar = () => {
                 onClick={() => {
                   signOut(), handleCloseMenu();
                 }}
-                className="hover:text-gray-300"
+                className="w-full text-left hover:text-gray-300 cursor-pointer"
               >
-                <LogoutIcon className="mr-2 cursor-pointer" /> Logout
+                Logout
               </button>
             ) : (
               <Link
-                className="mr-2 cursor-pointer"
+                className="cursor-pointer"
                 href="/pages/login"
                 onClick={handleCloseMenu}
               >
