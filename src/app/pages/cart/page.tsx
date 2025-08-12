@@ -1,13 +1,22 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/lib/auth/authOptions";
-import { redirect } from "next/navigation";
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { onAuthStateChanged, getAuth } from "firebase/auth";
+
 import CartClient from "./CartClient";
 
-export default async function CartPage() {
-  const session = await getServerSession(authOptions);
-  if (!session) {
-    return redirect("/pages/login");
-  }
+export default function CartPage() {
+  const router = useRouter();
+  const auth = getAuth();
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        router.push("/pages/login");
+      }
+    });
+    return () => unsubscribe();
+  }, []);
   return <CartClient />;
 }

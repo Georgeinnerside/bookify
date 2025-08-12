@@ -1,10 +1,12 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Suspense } from "react";
 import { useSearchBooks } from "@/hooks/useSearchBooks";
 import { SearchCard } from "@/components/cards/SearchCard";
 import { SearchCardSkeleton } from "@/components/loading/SearchCardSkeleton";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Footer from "@/components/Footer";
 
 export default function SearchPageWrapper() {
@@ -18,15 +20,23 @@ export default function SearchPageWrapper() {
 function SearchClient() {
   const searchParams = useSearchParams();
   const query = searchParams.get("q") || "";
-
+  const router = useRouter();
   const { data: books, isLoading, isError } = useSearchBooks(query);
 
   return (
     <>
-      <div className="p-4">
-        <h1 className="text-xl text-gray-700 font-bold mb-4">
-          Search results for: {query}
-        </h1>
+      <div className="flex flex-col items-center justify-center p-4">
+        <div className="p-4 flex items-center justify-between">
+          <button
+            onClick={() => router.back()}
+            className="text-blue-600 text-xl cursor-pointer"
+          >
+            <ArrowBackIcon />
+          </button>
+          <h1 className="text-xl text-gray-700 font-bold">
+            Search results for: {query}
+          </h1>
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {isLoading ? (
             Array.from({ length: 8 }).map((_, i) => (

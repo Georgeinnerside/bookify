@@ -58,7 +58,6 @@ export default function GenreCard({ book }: { book: any }) {
               <p className="text-gray-400 text-xs line-through">
                 ${book.oldPrice.toFixed(2)}
               </p>
-              <span className="text-xs text-red-500">Save ${discount}</span>
             </div>
           </div>
 
@@ -69,7 +68,7 @@ export default function GenreCard({ book }: { book: any }) {
                 e.preventDefault();
                 addToCart(book);
               }}
-              className="flex-1 bg-gray-900 text-white py-2 rounded text-sm hover:bg-gray-700"
+              className="flex-1 bg-gray-900 text-white py-2 rounded text-[12px] hover:bg-gray-700"
             >
               Add to cart
             </button>

@@ -1,55 +1,52 @@
 "use client";
-import toast from "react-hot-toast";
-import z from "zod";
 import { useState } from "react";
-import { RegistrationSchema } from "@/app/lib/auth/validators";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+import { db, auth } from "@/app/lib/firebase";
+import toast from "react-hot-toast";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent) {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
+
+    if (!email || !password) return setError("Email and password required!");
+
     try {
-      RegistrationSchema.parse(form);
+      const { user } = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      console.log(user);
 
-      const res = await fetch("/api/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+      // store extra user info in firestore
+      await setDoc(doc(db, "users", user.uid), {
+        email: user.email,
+        wishlist: [],
+        cart: [],
+        createdAt: new Date(),
       });
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        toast.error(errorData.error || "Invalid credentials");
-        return;
-      }
+      toast.success("Registration successful!");
+      router.push("/");
 
-      toast.success("registration successful!");
-      await signIn("credentials", {
-        redirect: false,
-        email: form.email,
-        password: form.password,
-      });
-
-      router.push("/pages/wishlist");
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        console.log("Zod validation error:", error);
-        toast.error("Invalid input");
-      } else {
-        toast.error("Something went wrong");
-      }
+      setEmail("");
+      setPassword("");
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "Something went wrong. Try again");
+    } finally {
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -63,32 +60,25 @@ export default function RegisterPage() {
         <input
           type="email"
           placeholder="Email"
-          value={form.email}
-          onChange={(e) => setForm({ ...form, email: e.target.value })}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           className="w-full p-3 border border-gray-300 rounded text-gray-700"
         />
         <input
           type="password"
           placeholder="Password"
-          value={form.password}
-          onChange={(e) => setForm({ ...form, password: e.target.value })}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           className="w-full p-3 border border-gray-300 rounded text-gray-700"
         />
-        <input
-          type="password"
-          placeholder="Confirm Password"
-          value={form.confirmPassword}
-          onChange={(e) =>
-            setForm({ ...form, confirmPassword: e.target.value })
-          }
-          className="w-full p-3 border border-gray-300 rounded text-gray-700"
-        />
+
         {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+
         <button
           type="submit"
           className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded font-medium cursor-pointer"
         >
-          Register
+          {isLoading ? "Registering" : "Register"}
         </button>
       </form>
     </div>

@@ -107,8 +107,7 @@ export default function CartClient() {
         </div>
       </div>
 
-      <button
-       className="w-full bg-blue-600 text-white py-4 rounded-xl text-base font-semibold hover:bg-blue-700 transition cursor-pointer">
+      <button className="w-full bg-blue-600 text-white py-4 rounded-xl text-base font-semibold hover:bg-blue-700 transition cursor-pointer">
         Process To Check Out
       </button>
     </div>

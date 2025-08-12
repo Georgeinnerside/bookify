@@ -7,20 +7,27 @@ import { useWishlist } from "@/context/WishlistContext";
 import { motion, AnimatePresence } from "framer-motion";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
-import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
-import { useSession, signOut } from "next-auth/react";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { auth } from "@/app/lib/firebase";
 
 export const Navbar = () => {
-  const { data } = useSession();
+  const [user, setUser] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const { wishlist } = useWishlist();
   const { cartCount } = useCart();
 
-  // ✅ Bounce animation states
+  // Bounce animations
   const [wishlistBounce, setWishlistBounce] = useState(false);
   const [cartBounce, setCartBounce] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     if (wishlist.length > 0) {
@@ -38,12 +45,11 @@ export const Navbar = () => {
     }
   }, [cartCount]);
 
-  // ✅ Close menu when link is clicked
   const handleCloseMenu = () => setIsOpen(false);
 
   return (
     <nav className="sticky top-0 z-[100] bg-white shadow-md">
-      {/* ✅ Mobile Navbar */}
+      {/* Mobile Navbar */}
       <div className="flex items-center justify-between px-4 py-3 md:hidden">
         <button onClick={() => setIsOpen(true)}>
           <MenuIcon className="w-6 h-6 text-gray-700" />
@@ -72,7 +78,7 @@ export const Navbar = () => {
         </Link>
       </div>
 
-      {/* ✅ Desktop Navbar */}
+      {/* Desktop Navbar */}
       <div className="hidden md:flex justify-between items-center px-8 py-4">
         <Link href="/" className="font-bold text-2xl text-blue-700">
           Bookify
@@ -136,9 +142,9 @@ export const Navbar = () => {
           </Link>
 
           {/* Auth */}
-          {data ? (
+          {user ? (
             <button
-              onClick={() => signOut()}
+              onClick={() => signOut(auth)}
               className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
             >
               Logout
@@ -154,7 +160,7 @@ export const Navbar = () => {
         </div>
       </div>
 
-      {/*  Mobile Slide Menu List */}
+      {/* Mobile Slide Menu */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -165,60 +171,38 @@ export const Navbar = () => {
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
             className="fixed top-0 right-0 h-screen w-1/2 bg-blue-600 text-white font-bold shadow-lg flex flex-col p-6 space-y-6 z-50"
           >
-            {/* Close Button */}
             <button onClick={handleCloseMenu} className="self-end">
               <CloseIcon className="w-6 h-6" />
             </button>
 
-            {/* Navigation Links */}
-            <Link href="/" className="cursor-pointer" onClick={handleCloseMenu}>
+            <Link href="/" onClick={handleCloseMenu}>
               Home
             </Link>
-            <Link
-              href="/pages/new-release"
-              className="cursor-pointer"
-              onClick={handleCloseMenu}
-            >
+            <Link href="/pages/new-release" onClick={handleCloseMenu}>
               New Release
             </Link>
-            <Link
-              href="/pages/bestsellers"
-              className="cursor-pointer"
-              onClick={handleCloseMenu}
-            >
+            <Link href="/pages/bestsellers" onClick={handleCloseMenu}>
               Bestsellers
             </Link>
-            <Link
-              href="/pages/wishlist"
-              className="cursor-pointer"
-              onClick={handleCloseMenu}
-            >
+            <Link href="/pages/wishlist" onClick={handleCloseMenu}>
               Wishlist ({wishlist.length})
             </Link>
-            <Link
-              href="/pages/cart"
-              className="cursor-pointer"
-              onClick={handleCloseMenu}
-            >
+            <Link href="/pages/cart" onClick={handleCloseMenu}>
               Cart ({cartCount})
             </Link>
 
-            {/* Auth for mobile */}
-            {data ? (
+            {user ? (
               <button
                 onClick={() => {
-                  signOut(), handleCloseMenu();
+                  signOut(auth);
+                  handleCloseMenu();
                 }}
-                className="w-full text-left hover:text-gray-300 cursor-pointer"
+                className="w-full text-left hover:text-gray-300"
               >
                 Logout
               </button>
             ) : (
-              <Link
-                className="cursor-pointer"
-                href="/pages/login"
-                onClick={handleCloseMenu}
-              >
+              <Link href="/pages/login" onClick={handleCloseMenu}>
                 Login
               </Link>
             )}
