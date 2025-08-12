@@ -6,9 +6,8 @@ import { Navbar } from "@/components/Navbar";
 import { CartProvider } from "@/context/CartContext";
 import QueryProvider from "@/context/QuerClient";
 import { WishlistProvider } from "@/context/WishlistContext";
-import AuthClientProvider from "@/context/SessionContext";
-import Footer from "@/components/Footer";
 import { AuthProvider } from "@/context/AuthProvider";
+import Footer from "@/components/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
